@@ -6,7 +6,7 @@ import { Plus } from 'lucide-react';
 import { Button } from 'components/ui/button';
 import { Input } from 'components/ui/input';
 import { Badge } from 'components/ui/badge';
-import { cn } from 'lib/utils';
+import { cn, generateId } from 'lib/utils';
 import { TodoItem } from '../todo-item/todo-item';
 
 type Todo = {
@@ -18,10 +18,14 @@ type Todo = {
 
 export default function TodoList() {
   const [todos, setTodos] = useState<Todo[]>(() => {
-    // Load todos from localStorage if available
     if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('todos');
-      return saved ? JSON.parse(saved) : [];
+      try {
+        const saved = localStorage.getItem('todos');
+        return saved ? JSON.parse(saved) : [];
+      } catch (error) {
+        console.error('Failed to parse todos from localStorage', error);
+        return [];
+      }
     }
     return [];
   });
@@ -39,7 +43,7 @@ export default function TodoList() {
     setTodos([
       ...todos,
       {
-        id: crypto.randomUUID(),
+        id: generateId(),
         text: newTodo.trim(),
         completed: false,
         createdAt: new Date(),
@@ -63,6 +67,12 @@ export default function TodoList() {
   const clearCompleted = () => {
     setTodos(todos.filter((todo) => !todo.completed));
   };
+
+  const editTodo = (id: string, text: string) => {
+    setTodos(
+      todos.map((todo) => (todo.id === id ? { ...todo, text } : todo)),
+    );
+  }
 
   const filteredTodos = todos.filter((todo) => {
     if (filter === 'active') return !todo.completed;
@@ -109,6 +119,7 @@ export default function TodoList() {
                   todo={todo}
                   onToggle={toggleTodo}
                   onDelete={deleteTodo}
+                  onEdit={editTodo}
                 />
               ))
             ) : (
