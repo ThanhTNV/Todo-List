@@ -113,7 +113,6 @@ export function TodoItem({ todo, onToggle, onDelete, onEdit }: TodoItemProps) {
           className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
           onClick={() => onDelete(todo.id)}
         >
-          Delete
           <Trash2 className="h-4 w-4 text-gray-400 hover:text-red-500" />
         </Button>
       </div>
